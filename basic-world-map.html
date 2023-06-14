@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Load d3.js -->
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+    <title>Basic map</title>
+  </head>
+  <body>
+    <svg id="basic-world-map" width="500" height="400"></svg>
+    <svg id="basic-france-map" width="500" height="400"></svg>
+
+    <script>
+      const worldMap = d3.select("#basic-world-map");
+      const width = +worldMap.attr("width");
+      const height = +worldMap.attr("height");
+
+      const projection = d3
+        // .geoBerghaus()
+        // .geoAlbers()
+        // .geoAitoff()
+        .geoNaturalEarth1()
+        // .geoMercator()
+        .scale(width / 2 / Math.PI)
+        .translate([width / 2, height / 2]);
+
+      // Load external data and boot
+
+      d3.json(
+        "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson",
+        function (data) {
+          console.log({ data });
+
+          worldMap
+            .append("g")
+            .selectAll("path")
+            .data(data.features)
+            .enter()
+            .append("path")
+            .attr("fill", "#69b3a2")
+            .attr("d", d3.geoPath().projection(projection))
+            .style("stroke", "#fff");
+        }
+      );
+
+      const franceMap = d3.select("#basic-france-map");
+      const franceWidth = +franceMap.attr("width");
+      const franceHeight = +franceMap.attr("height");
+
+      const franceProjection = d3
+        .geoMercator()
+        .center([2, 47])
+        .scale(1000)
+        .translate([width / 2, height / 2]);
+
+      // Load external data and boot
+
+      d3.json(
+        "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson",
+        function (data) {
+          console.log({ data });
+
+          data.features = data.features.filter((feature) => {
+            console.log(feature.properties.name);
+            return feature.properties.name === "France";
+          });
+
+          franceMap
+            .append("g")
+            .selectAll("path")
+            .data(data.features)
+            .enter()
+            .append("path")
+            .attr("fill", "#69b3a2")
+            .attr("d", d3.geoPath().projection(franceProjection))
+            .style("stroke", "none");
+        }
+      );
+    </script>
+  </body>
+</html>
