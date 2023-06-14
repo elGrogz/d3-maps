@@ -27,8 +27,9 @@
         .scale(width / 2 / Math.PI)
         .translate([width / 2, height / 2]);
 
-      // Load external data and boot
+      const geoGenerator = d3.geoPath().projection(projection);
 
+      // Load external data and boot
       d3.json(
         "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson",
         function (data) {
@@ -41,8 +42,19 @@
             .enter()
             .append("path")
             .attr("fill", "#69b3a2")
-            .attr("d", d3.geoPath().projection(projection))
+            .attr("d", geoGenerator)
             .style("stroke", "#fff");
+
+          const graticule = d3.geoGraticule10();
+
+          worldMap
+            .append("g")
+            .selectAll("path")
+            .data(graticule)
+            .enter()
+            .append("path")
+            .attr("d", geoGenerator)
+            .attr("stroke", "#69b3a2");
         }
       );
 
@@ -53,7 +65,7 @@
       const franceProjection = d3
         .geoMercator()
         .center([2, 47])
-        .scale(1000)
+        .scale(100)
         .translate([width / 2, height / 2]);
 
       // Load external data and boot
@@ -61,11 +73,11 @@
       d3.json(
         "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson",
         function (data) {
-          console.log({ data });
+          //   console.log({ data });
 
           data.features = data.features.filter((feature) => {
-            console.log(feature.properties.name);
-            return feature.properties.name === "France";
+            // console.log(feature.properties.name);
+            return feature.properties.name !== "Russia";
           });
 
           franceMap
